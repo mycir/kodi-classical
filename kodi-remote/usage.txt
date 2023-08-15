@@ -1,0 +1,46 @@
+KODI-REMOTE
+
+kodi-remote.py  -a <address> -p <port>  -u <username> -P <password>
+
+Address can be that of a remote kodi instance, 'loopback' or '127.0.0.1'.
+
+Return or double click plays a playlist item.
+
+Space plays or pauses an item, or activates a focused player button.
+
+Right and left arrow keys, PageUp and PageDown, skip forward and back.
+
+Tab and Shift+Tab navigate keyboard focus around the kodi-remote window.
+
+Alt+D or click toggles the media details pane between playlist item and
+playing item details.
+
+Escape clears the playlist filter.
+
+To filter a playlist by artist and/or composer, use the following syntax
+(case insensitive):
+
+<word (beginning or complete)>+<word (beginning or complete)>...
+To match alternative spellings:
+
+<word (beginning or complete)>|<word (beginning or complete)>...
+
+For example, janso+tchai|tschai|tsjai|tjaj might find UK/US/French, German,
+Dutch and Scandinavian broadcasts that include works by Tchaikovsky
+conducted by Mariss Jansons.
+
+There is no need to use a language virtual keyboard - bartok will do for Bartók.
+(Latin characters with diacritics will be reduced to their plain equivalents.)
+
+To browse and filter your complete collection of playlists, click the
+'Combine' button bottom left.
+
+At present, Kodi/JSON-RPC errors are fatal but future versions may allow
+for recoverable errors. 
+
+Return codes:
+
+Normal execution: 0
+Connection error: 1
+Kodi/SON-RPC error: 2
+Other error: 3
