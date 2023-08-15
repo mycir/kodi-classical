@@ -105,8 +105,8 @@ class KodiManager(QObject, Kodi):
             ".mp4",
             ".webm",
         )
-        self.notifications_listener = None
         self.child = None
+        self.watchdog = None
         self.get_a_kodi()
         self.watchdog = KodiManager.KodiWatchdog(
             self, self.host, self.player_state
@@ -142,8 +142,6 @@ class KodiManager(QObject, Kodi):
                 raise ConnectionError()
         except Exception:
             self.instance_type = None
-            if self.watchdog.watchdog_timer:
-                self.watchdog.watchdog_timer.close()
             self.quit()
             raise
 
@@ -401,7 +399,8 @@ class KodiManager(QObject, Kodi):
     def quit(self):
         if self.child:
             self.child.terminate()
-        self.watchdog.quit()
+        if self.watchdog:
+            self.watchdog.quit()
 
     class KodiWatchdog(QObject):
         player_state_changed = Signal(PlayerState)
@@ -439,25 +438,28 @@ class KodiManager(QObject, Kodi):
                 self.playing = False
             self.percentage = 0
             self.seeking = False
-            self.start_notifications()
+            self.start_listener()
 
         def on_seek(self):
             self.seeking = True
 
         def quit(self):
-            if self.notifications_listener:
-                self.notifications_listener.close()
+            if self.listener:
+                self.listener.close()
             self.watchdog_timer.close()
             self.finished.emit()
 
-        def start_notifications(self):
-            self.notifications_listener = websocket.WebSocketApp(
-                f"ws://{self.host}:9090/jsonrpc",
-                on_message=self.on_notification,
-            )
-            QThreadPool.globalInstance().start(
-                self.notifications_listener.run_forever
-            )
+        def start_listener(self):
+            try:
+                self.listener = websocket.WebSocketApp(
+                    f"ws://{self.host}:9090/jsonrpc",
+                    on_message=self.on_notification,
+                )
+                QThreadPool.globalInstance().start(
+                    self.listener.run_forever
+                )
+            except websocket.WebSocketException:
+                self.quit()
 
         def on_timer_timeout(self):
             if self.playing and not self.seeking:
