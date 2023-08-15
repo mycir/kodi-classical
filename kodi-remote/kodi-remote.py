@@ -1441,10 +1441,6 @@ class KodiRemote(QMainWindow):
                 self.tries -= 1
             self.finished.emit()
 
-    Label = 0
-    Path = 1
-    Type = 2
-
 
 class KodiModel(QStandardItemModel):
     items_changed = Signal()
