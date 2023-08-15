@@ -696,9 +696,6 @@ class KodiRemote(QMainWindow):
         self.ui.pushButtonCombine.clicked.connect(
             lambda: self.combine_playlists()
         )
-        self.ui.horizontalSliderSeek.actionTriggered.connect(
-            self.on_slider_action_triggered
-        )        
         self.ui.horizontalSliderSeek.sliderMoved.connect(
             self.on_seek_slider_moved
         )
@@ -717,9 +714,9 @@ class KodiRemote(QMainWindow):
     def eventFilter(self, widget, event):
         if event.type() == QEvent.KeyPress:
             key = event.key()
-            ar = event.isAutoRepeat()
+            self.in_autorepeat = event.isAutoRepeat()
             if widget is self.ui.horizontalSliderVolume:
-                slider = self.ui.horizontalSliderVolume
+                slider = widget
                 p = slider.sliderPosition()
                 p_new = None
                 if key == Qt.Key_PageUp:
@@ -735,56 +732,47 @@ class KodiRemote(QMainWindow):
                     return True
             elif self.ui.widgetPlaying.isVisible():
                 if widget is not self.ui.lineEditFilter:
-                    if key == Qt.Key_PageDown:
-                        self.ui.horizontalSliderSeek.triggerAction(
-                            QAbstractSlider.SliderPageStepSub
-                        )
-                        self.in_autorepeat = ar
-                        return True
-                    elif key == Qt.Key_PageUp:
-                        self.ui.horizontalSliderSeek.triggerAction(
-                            QAbstractSlider.SliderPageStepAdd
-                        )
-                        self.in_autorepeat = ar
-                        return True
+                    slider = self.ui.horizontalSliderSeek
+                    p = slider.sliderPosition()
+                    p_new = None
+                    if key == Qt.Key_PageUp:
+                        p_new = p + 10000
+                    elif key == Qt.Key_PageDown:
+                        p_new = p - 10000
                     if widget is not self.ui.lineEditFilter:
                         if key == Qt.Key_Left:
-                            self.ui.horizontalSliderSeek.triggerAction(
-                                QAbstractSlider.SliderSingleStepSub
-                            )
-                            self.in_autorepeat = ar
-                            return True
+                            p_new = p - slider.singleStep()
                         elif key == Qt.Key_Right:
-                            self.ui.horizontalSliderSeek.triggerAction(
-                                QAbstractSlider.SliderSingleStepAdd
-                            )
-                            self.in_autorepeat = ar
-                            return True
-            if key == Qt.Key_Space:
-                if QApplication.focusWidget() not in (
-                    self.ui.pushButtonSkipBackward,
-                    self.ui.pushButtonPlay,
-                    self.ui.pushButtonStop,
-                    self.ui.pushButtonSkipForward,
-                    self.ui.pushButtonMute,
-                    self.ui.lineEditFilter,
-                ):
-                    self.do_action(KodiRemote.Action.Play)
+                            p_new = p + slider.singleStep()
+                    if p_new:
+                        slider.setValue(p_new)
+                        return True
+            if not self.in_autorepeat:
+                if key == Qt.Key_Space:
+                    if QApplication.focusWidget() not in (
+                        self.ui.pushButtonSkipBackward,
+                        self.ui.pushButtonPlay,
+                        self.ui.pushButtonStop,
+                        self.ui.pushButtonSkipForward,
+                        self.ui.pushButtonMute,
+                        self.ui.lineEditFilter,
+                    ):
+                        self.do_action(KodiRemote.Action.Play)
+                        return True
+                elif key == Qt.Key_Return and widget is self.ui.listView:
+                    item, _ = self.current_item()
+                    if item[Column.Type] in ("media_file", "song"):
+                        self.play_if_playable(item)
+                    else:
+                        self.do_action(KodiRemote.Action.Get_Item)
                     return True
-            elif key == Qt.Key_Return and widget is self.ui.listView:
-                item, _ = self.current_item()
-                if item[Column.Type] in ("media_file", "song"):
-                    self.play_if_playable(item)
-                else:
-                    self.do_action(KodiRemote.Action.Get_Item)
-                return True
-            elif key == Qt.Key_D:
-                if event.modifiers() == Qt.KeyboardModifier.AltModifier:
-                    self.toggle_details()
+                elif key == Qt.Key_D:
+                    if event.modifiers() == Qt.KeyboardModifier.AltModifier:
+                        self.toggle_details()
+                        return True
+                elif key == Qt.Key_Escape and widget is self.ui.lineEditFilter:
+                    self.do_action(KodiRemote.Action.Filter_Clear)
                     return True
-            elif key == Qt.Key_Escape and widget is self.ui.lineEditFilter:
-                self.do_action(KodiRemote.Action.Filter_Clear)
-                return True
             self.in_autorepeat = False
         elif event.type() == QEvent.KeyRelease:
             key = event.key()
@@ -795,17 +783,16 @@ class KodiRemote(QMainWindow):
             ):
                 if key == Qt.Key_Left:
                     self.on_key_release(ar)
-                    return False
                 elif key == Qt.Key_Right:
                     self.on_key_release(ar)
-                    return False
-            if widget is not self.ui.listView:
+            if widget not in (
+                self.ui.listView,
+                self.ui.horizontalSliderVolume
+            ):
                 if key == Qt.Key_PageUp:
                     self.on_key_release(ar)
-                    return False
                 elif key == Qt.Key_PageDown:
                     self.on_key_release(ar)
-                    return False
             if widget is self.ui.listView:
                 ci, ci_index = self.current_item()
                 if key in (
@@ -821,7 +808,7 @@ class KodiRemote(QMainWindow):
                     else:
                         self.ui.textEditBrowsing.clear()
                     return True
-            self.in_autorepeat = False
+            self.in_autorepeat = ar
         elif event.type() is QMouseEvent.MouseButtonPress:
             if widget.parent() in (
                 self.ui.textEditBrowsing,
@@ -1161,24 +1148,24 @@ class KodiRemote(QMainWindow):
     def seek(self, percentage):
         AsyncRunner(self.kodi.seek, None, None, percentage)
 
-    def on_slider_action_triggered(self, action):
-        v = self.ui.horizontalSliderSeek.sliderPosition()
-        if action == QAbstractSlider.SliderSingleStepAdd:
-            self.ui.horizontalSliderSeek.setSliderPosition(
-                v + self.ui.horizontalSliderSeek.singleStep()
-            )
-        elif action == QAbstractSlider.SliderSingleStepSub:
-            self.ui.horizontalSliderSeek.setSliderPosition(
-                v - self.ui.horizontalSliderSeek.singleStep()
-            )
-        if action == QAbstractSlider.SliderPageStepAdd:
-            self.ui.horizontalSliderSeek.setSliderPosition(
-                v + self.ui.horizontalSliderSeek.pageStep()
-            )
-        elif action == QAbstractSlider.SliderPageStepSub:
-            self.ui.horizontalSliderSeek.setSliderPosition(
-                v - self.ui.horizontalSliderSeek.pageStep()
-            )
+    # def on_slider_action_triggered(self, action):
+    #     v = self.ui.horizontalSliderSeek.sliderPosition()
+    #     if action == QAbstractSlider.SliderSingleStepAdd:
+    #         self.ui.horizontalSliderSeek.setSliderPosition(
+    #             v + self.ui.horizontalSliderSeek.singleStep()
+    #         )
+    #     elif action == QAbstractSlider.SliderSingleStepSub:
+    #         self.ui.horizontalSliderSeek.setSliderPosition(
+    #             v - self.ui.horizontalSliderSeek.singleStep()
+    #         )
+    #     if action == QAbstractSlider.SliderPageStepAdd:
+    #         self.ui.horizontalSliderSeek.setSliderPosition(
+    #             v + self.ui.horizontalSliderSeek.pageStep()
+    #         )
+    #     elif action == QAbstractSlider.SliderPageStepSub:
+    #         self.ui.horizontalSliderSeek.setSliderPosition(
+    #             v - self.ui.horizontalSliderSeek.pageStep()
+    #         )
 
     def on_seek_slider_changed(self, value):
         p = value / 1000
