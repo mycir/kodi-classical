@@ -142,12 +142,13 @@ class KodiManager(QObject, Kodi):
                 raise ConnectionError()
         except Exception:
             self.instance_type = None
-            self.watchdog.watchdog_timer.close()
+            if self.watchdog.watchdog_timer:
+                self.watchdog.watchdog_timer.close()
             self.quit()
             raise
 
     def is_rpc_active(self):
-        max_tries = 30
+        max_tries = 50
         while max_tries:
             try:
                 # Unfortunately, kodijson does not pass kwargs
@@ -1147,25 +1148,6 @@ class KodiRemote(QMainWindow):
 
     def seek(self, percentage):
         AsyncRunner(self.kodi.seek, None, None, percentage)
-
-    # def on_slider_action_triggered(self, action):
-    #     v = self.ui.horizontalSliderSeek.sliderPosition()
-    #     if action == QAbstractSlider.SliderSingleStepAdd:
-    #         self.ui.horizontalSliderSeek.setSliderPosition(
-    #             v + self.ui.horizontalSliderSeek.singleStep()
-    #         )
-    #     elif action == QAbstractSlider.SliderSingleStepSub:
-    #         self.ui.horizontalSliderSeek.setSliderPosition(
-    #             v - self.ui.horizontalSliderSeek.singleStep()
-    #         )
-    #     if action == QAbstractSlider.SliderPageStepAdd:
-    #         self.ui.horizontalSliderSeek.setSliderPosition(
-    #             v + self.ui.horizontalSliderSeek.pageStep()
-    #         )
-    #     elif action == QAbstractSlider.SliderPageStepSub:
-    #         self.ui.horizontalSliderSeek.setSliderPosition(
-    #             v - self.ui.horizontalSliderSeek.pageStep()
-    #         )
 
     def on_seek_slider_changed(self, value):
         p = value / 1000
