@@ -4,13 +4,19 @@ kodi-remote.py  -a <address> -p <port>  -u <username> -P <password>
 
 Address can be that of a remote kodi instance, 'loopback' or '127.0.0.1'.
 
+Tab and Shift+Tab navigate keyboard focus around the kodi-remote window.
+
 Return or double click plays a playlist item.
 
 Space plays or pauses an item, or activates a focused player button.
 
 Right and left arrow keys, PageUp and PageDown, skip forward and back.
 
-Tab and Shift+Tab navigate keyboard focus around the kodi-remote window.
++ and - adjust volume.
+
+F8 toggles mute.
+
+Alt+C combines a folder of playlists.
 
 Alt+D or click toggles the media details pane between playlist item and
 playing item details.

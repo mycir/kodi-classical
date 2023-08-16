@@ -120,10 +120,12 @@ class KodiManager(QObject, Kodi):
         self.watchdog.new_duration.connect(
             lambda d: setattr(self, "duration", d)
         )
+        self.seeking.connect(
+            lambda: setattr(self.watchdog, "seeking", True)
+        )
         self.watchdog.finished.connect(
             self.watchdog_thread.quit, Qt.DirectConnection
         )
-        self.seeking.connect(self.watchdog.on_seek)
 
     def get_a_kodi(self):
         try:
@@ -397,10 +399,10 @@ class KodiManager(QObject, Kodi):
         )
 
     def quit(self):
-        if self.child:
-            self.child.terminate()
         if self.watchdog:
             self.watchdog.quit()
+        if self.child:
+            self.child.terminate()
 
     class KodiWatchdog(QObject):
         player_state_changed = Signal(PlayerState)
@@ -432,16 +434,13 @@ class KodiManager(QObject, Kodi):
             self.watchdog_timer = self.WatchdogTimer()
             self.watchdog_timer.timeout.connect(self.on_timer_timeout)
             self.watchdog_timer.start()
-            if player_state is PlayerState.Playing:
+            if player_state is not PlayerState.Ready:
                 self.playing = True
             else:
                 self.playing = False
             self.percentage = 0
             self.seeking = False
             self.start_listener()
-
-        def on_seek(self):
-            self.seeking = True
 
         def quit(self):
             if self.listener:
@@ -521,6 +520,7 @@ class KodiRemote(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.model = KodiModel(self.ui.lineEditFilter)
+        self.view = KodiRemote.View.Anything
         self.in_autorepeat = False
         self.seek_slider_in_click = False
         self.set_styles()
@@ -651,7 +651,7 @@ class KodiRemote(QMainWindow):
                 )
             self.display_tags()
             self.ui.stackedWidgetDetails.setCurrentIndex(1)
-            self.set_seek_slider_step()
+            self.update_player_widgets(self.set_seek_slider_step())
 
     def installEventFilters(self):
         self.ui.listView.installEventFilter(self)
@@ -769,14 +769,10 @@ class KodiRemote(QMainWindow):
                     else:
                         self.do_action(KodiRemote.Action.Get_Item)
                     return True
-                elif key == Qt.Key_D:
-                    if event.modifiers() == Qt.KeyboardModifier.AltModifier:
-                        self.toggle_details()
-                        return True
                 elif key == Qt.Key_Escape and widget is self.ui.lineEditFilter:
                     self.do_action(KodiRemote.Action.Filter_Clear)
                     return True
-            self.in_autorepeat = False
+            return self.check_if_shortcut(key, event.modifiers(), widget)
         elif event.type() == QEvent.KeyRelease:
             key = event.key()
             ar = event.isAutoRepeat()
@@ -852,6 +848,29 @@ class KodiRemote(QMainWindow):
                         self.ui.lineEditFilter.setFocus()
                     else:
                         self.ui.listView.setFocus()
+        return False
+
+    def check_if_shortcut(self, key, modifiers, widget):
+        if not self.in_autorepeat:
+            if modifiers == Qt.KeyboardModifier.AltModifier:
+                if key == Qt.Key_D:
+                    self.toggle_details()
+                    return True
+                if key == Qt.Key_C:
+                    if self.view is KodiRemote.View.Combineable:
+                        self.combine_playlists()
+                        return True
+                return False
+            if key == Qt.Key_F8:
+                self.kodi.toggle_mute()
+                return True
+        if widget is not self.ui.lineEditFilter:
+            if key == Qt.Key_Minus:
+                self.kodi.set_volume(self.kodi.get_volume() - 1)
+                return True
+            if key == Qt.Key_Plus:
+                self.kodi.set_volume(self.kodi.get_volume() + 1)
+                return True
         return False
 
     def on_key_release(self, autorepeat):
@@ -1114,6 +1133,7 @@ class KodiRemote(QMainWindow):
                 self.ui.pushButtonCombine.show()
             self.ui.stackedWidget.setCurrentIndex(0)
         QApplication.processEvents()
+        self.view = view
 
     def play_if_playable(self, item=None):
         if not item:
@@ -1196,8 +1216,8 @@ class KodiRemote(QMainWindow):
         self.single_step_changed = True
         self.ui.horizontalSliderSeek.setSingleStep(ss)
         p, _ = self.get_player_stats()
-        v = p * 1000
-        self.ui.horizontalSliderSeek.setValue(v)
+        self.ui.horizontalSliderSeek.setValue(p * 1000)
+        return p
 
     def skip(self, seek_direction):
         p = self.kodi.get_percentage()
