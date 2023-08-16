@@ -120,9 +120,7 @@ class KodiManager(QObject, Kodi):
         self.watchdog.new_duration.connect(
             lambda d: setattr(self, "duration", d)
         )
-        self.seeking.connect(
-            lambda: setattr(self.watchdog, "seeking", True)
-        )
+        self.seeking.connect(lambda: setattr(self.watchdog, "seeking", True))
         self.watchdog.finished.connect(
             self.watchdog_thread.quit, Qt.DirectConnection
         )
@@ -454,9 +452,7 @@ class KodiManager(QObject, Kodi):
                     f"ws://{self.host}:9090/jsonrpc",
                     on_message=self.on_notification,
                 )
-                QThreadPool.globalInstance().start(
-                    self.listener.run_forever
-                )
+                QThreadPool.globalInstance().start(self.listener.run_forever)
             except websocket.WebSocketException:
                 self.quit()
 
@@ -700,7 +696,9 @@ class KodiRemote(QMainWindow):
             lambda: self.combine_playlists()
         )
         self.ui.horizontalSliderSeek.sliderMoved.connect(
-            self.on_seek_slider_moved
+            lambda value: self.update_player_widgets(
+                value / 1000, set_slider_pos=False
+            )
         )
         self.ui.horizontalSliderSeek.valueChanged.connect(
             self.on_seek_slider_changed
@@ -784,10 +782,7 @@ class KodiRemote(QMainWindow):
                     self.on_key_release(ar)
                 elif key == Qt.Key_Right:
                     self.on_key_release(ar)
-            if widget not in (
-                self.ui.listView,
-                self.ui.horizontalSliderVolume
-            ):
+            if widget not in (self.ui.listView, self.ui.horizontalSliderVolume):
                 if key == Qt.Key_PageUp:
                     self.on_key_release(ar)
                 elif key == Qt.Key_PageDown:
@@ -1156,13 +1151,13 @@ class KodiRemote(QMainWindow):
             self.kodi.activate_window("visualisation")
         else:
             self.kodi.play_pause()
-            
+
     def on_volume_changed(self, volume, muted):
         self.ui.horizontalSliderVolume.setSliderPosition(volume)
         if muted:
             self.ui.pushButtonMute.setIcon(
                 self.style().standardIcon(QStyle.SP_MediaVolumeMuted)
-            )    
+            )
         else:
             self.ui.pushButtonMute.setIcon(
                 self.style().standardIcon(QStyle.SP_MediaVolume)
@@ -1181,10 +1176,6 @@ class KodiRemote(QMainWindow):
             self.seek(p)
         else:
             self.update_player_widgets(p, set_slider_pos=False)
-
-    def on_seek_slider_moved(self, value):
-        p = value / 1000
-        self.update_player_widgets(p, set_slider_pos=False)
 
     def on_new_percentage(self, p):
         if (
