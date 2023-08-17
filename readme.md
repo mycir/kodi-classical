@@ -66,9 +66,7 @@ playlist-generator.py [ ~/Radio | %USER_PROFILE%\Radio ]
 <br/><br/>
 ## playlist-recomposer
 
-Code in review.
-
-<strike><b>playlist-recomposer</b> generates .pls playlists from other playlists, where broadcast details may include works numbered according to the following catalogues:
+[**playlist-recomposer**](./playlist-recomposer/playlist-recomposer.py) generates .pls playlists from other playlists, where broadcast details may include works numbered according to the following catalogues:
 
 ```bash
 Opus Numbers
@@ -90,7 +88,21 @@ Hob.XVI/20 - Haydn, Sonata in C minor
 
 It is tolerant, to a degree, of punctuation, whitespace and prefixes to catalogue numbers in various different languages, e.g. No., N° and Nr.
 
-<b>playlist-recomposer</b> dependencies are Python >= 3.7, PySide6 and Qt >= 6.4.</strike>
+It presents a file picker to choose the playlists source folder and select catalogues, e.g.
+
+~/Radio/Playlists | %USER_PROFILE%\Radio\Playlists
+
+Followed by another to choose the destination folder for catalogued playlists, e.g.
+
+~/Radio/Catalogue Playlists | %USER_PROFILE%\Radio\Catalogue Playlists
+
+NB Both source and destination folders must share the same parent, e.g.
+
+~/Radio | %USER_PROFILE%\Radio
+
+**Caveats**: This is a beta version: Only .pls playlists are supported. The regular expressions used to search for catalogue name abbreviations could probably be refined. And composer catalogue names that share the same abbreviation, e.g. K for Mozart and Scarlatti, need further consideration. 
+
+[**playlist-recomposer**](./playlist-recomposer/playlist-recomposer.py) dependencies are Python >= 3.7, PySide6 and Qt >= 6.4.
 <br/><br/>
 ## Dependencies
 
@@ -148,6 +160,9 @@ pip install pymediainfo
 <br/><br/>
 <br/><br/>
 ![Screenshot](./screenshots/kodi-remote-cd.gif)
+<br/><br/>
+## playlist-recomposer
+![Screenshot](./screenshots/playlist-recomposer.gif)
 
 
 
