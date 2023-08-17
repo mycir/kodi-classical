@@ -100,6 +100,12 @@ NB Both source and destination folders must share the same parent, e.g.
 
 ~/Radio | %USER_PROFILE%\Radio
 
+[**playlist-recomposer**](./playlist-recomposer/playlist-recomposer.py) accepts a single (optional) command line argument to set the root folder for the file pickers, e.g.
+
+```bash
+playlist-recomposer.py [ ~/Radio | %USER_PROFILE%\Radio ]
+```
+
 **Caveats**: This is a beta version: Only .pls playlists are supported. The regular expressions used to search for catalogue name abbreviations could probably be refined. And composer catalogue names that share the same abbreviation, e.g. K for Mozart and Scarlatti, need further consideration. 
 
 [**playlist-recomposer**](./playlist-recomposer/playlist-recomposer.py) dependencies are Python >= 3.7, PySide6 and Qt >= 6.4.
