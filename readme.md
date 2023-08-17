@@ -42,13 +42,13 @@ Finally, to browse and filter your complete collection of playlists, click the '
 ## playlist-generator
 [**playlist-generator**](./playlist-generator/playlist-generator.py) generates .pls playlists for recorded radio broadcasts.
 
-It presents a file picker to choose the destination folder for playlists, e.g.
-
-~/Radio/Playlists | %USER_PROFILE%\Radio\Playlists
-
-Followed by another to choose the mediafile sources folder, e.g.
+It presents a file picker to choose the mediafile sources folder, e.g.
 
 ~/Radio/Stations | %USER_PROFILE%\Radio\Stations
+
+Followed by another to choose the destination folder for playlists, e.g.
+
+~/Radio/Playlists | %USER_PROFILE%\Radio\Playlists
 
 NB Both source and destination folders must share the same parent, e.g.
 

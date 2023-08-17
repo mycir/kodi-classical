@@ -84,10 +84,6 @@ class PlaylistGenerator:
 
     @staticmethod
     def generate_playlists(playlists_dir, sources_dir, splashscreen=None):
-        pd_parent = os.path.abspath(os.path.join(pf, os.pardir))
-        sd_parent = os.path.abspath(os.path.join(sf, os.pardir))
-        if sd_parent != pd_parent:
-            return False
         if platform.system() == "Windows":
             sep = "\\"
         else:
@@ -144,36 +140,42 @@ if __name__ == "__main__":
         root = sys.argv[1]
     else:
         root = os.path.expanduser("~")
-    fd = FolderDialog("Choose destination folder for playlists", root)
-    if fd.exec():
-        pf = fd.selectedFiles()[0]
-    else:
-        pf = None
+    err_msg = None
     fd = FolderDialog("Choose mediafile sources folder", root)
     if fd.exec():
         sf = fd.selectedFiles()[0]
-    else:
-        sf = None
-    if pf and sf:
-        pm = QPixmap(1000, 300)
-        pm.fill(Qt.gray)
-        ss = QSplashScreen(pm, Qt.WindowStaysOnTopHint)
-        ss.setStyleSheet("font-weight: bold;")
-        ss.show()
-        app.processEvents()
-        res = PlaylistGenerator.generate_playlists(pf, sf, ss)
-        if res is True:
-            sys.exit(0)
+        fd = FolderDialog("Choose destination folder for playlists", root)
+        if fd.exec():
+            pf = fd.selectedFiles()[0]
+            sf_parent = os.path.abspath(os.path.join(sf, os.pardir))
+            pf_parent = os.path.abspath(os.path.join(pf, os.pardir))
+            if sf_parent == pf_parent:
+                pm = QPixmap(1000, 300)
+                pm.fill(Qt.gray)
+                ss = QSplashScreen(pm, Qt.WindowStaysOnTopHint)
+                ss.setStyleSheet("font-weight: bold;")
+                ss.show()
+                app.processEvents()
+                PlaylistGenerator.generate_playlists(pf, sf, ss)
+            else:
+                err_msg = (
+                    "\nCannot continue.\n\nPlaylists folder "
+                    "and sources folder must share the same parent.\n\n"
+                    "(This is because playlist media paths will be written\n"
+                    "relative to the playlists folder so that the parent tree\n"
+                    "can be easily moved or copied "
+                    "to one of your other devices.)"
+                )
         else:
-            ss.close()
             err_msg = (
-                "\nCannot continue.\n\nPlaylists folder "
-                "and sources folder must share the same parent.\n\n"
-                "(This is because playlist media paths will be written\n"
-                "relative to the playlists folder so that the parent tree\n"
-                "can be easily moved or copied to one of your other devices.)"
+                "\nCannot continue.\n\n"
+                "No destination folder for playlists chosen.\t\n"
             )
     else:
-        err_msg = "\nCannot continue, no playlists or sources folder chosen.\n"
-    QMessageBox(QMessageBox.Critical, "Playlist Generator", err_msg).exec()
-    sys.exit(1)
+        err_msg = (
+            "\nCannot continue.\n\nNo mediafile sources folder chosen.\t\n"
+        )
+    if err_msg:
+        QMessageBox(
+            QMessageBox.Critical, "Playlist Generator - Error", err_msg
+        ).exec()
