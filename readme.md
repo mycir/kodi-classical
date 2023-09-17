@@ -112,6 +112,8 @@ playlist-recomposer.py [ ~/Radio | %USER_PROFILE%\Radio ]
 <br/><br/>
 ## Dependencies
 
+(Only required when running as a Python script, see release notes below.)
+
 Python >= 3.7
 
 Qt >= 6.4
@@ -159,6 +161,14 @@ pymediainfo
 ```bash
 pip install pymediainfo
 ```
+&nbsp;
+## Releases
+
+These are standalone executables that include all necessary libraries.<br/>Furthermore, they do not require Python to be installed.
+
+As of September 2023, the only provided releases are for X11 Linux-x64 systems.
+
+(Windows and macOS versions may follow, as time permits.)
 <br/><br/>
 ## Screenshots
 <br/><br/>
