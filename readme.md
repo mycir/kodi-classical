@@ -1,6 +1,6 @@
 # kodi-classical
 <br/><br/>
-kodi-classical is a collection of scripts to ease playback and curation of recorded classical music broadcasts.
+kodi-classical is a collection of scripts to ease playback and curation of recorded classical music broadcasts. [Releases](https://github.com/mycir/kodi-classical/releases) are available for Linux, Windows and MacOS.
 <br/><br/>
 ## kodi-remote
 [**kodi-remote**](./kodi-remote/kodi-remote.py) is a [Kodi](https://kodi.tv/download/) remote control. Although very basic, it has a few tricks:
@@ -120,6 +120,8 @@ Qt >= 6.4
 
 [Get and Install Qt](https://doc.qt.io/qt-6/get-and-install-qt.html)
 
+Note: [aqtinstall](https://github.com/miurahr/aqtinstall) is highly recommended as a lightweight alternative to the Qt online installers and maintenance tool (only qtbase is necessary to run the kodi-classical scripts).
+
 PySide6
 
 ```bash
@@ -133,7 +135,7 @@ pip install PySide6
 kodijson
 
 ```bash
-pip install kodijson
+pip install kodi-json
 ```
 
 psutil
@@ -148,10 +150,10 @@ requests
 pip install requests
 ```
 
-websocket
+websocket-client
 
 ```bash
-pip install websocket
+pip install websocket-client
 ```
 
 [**playlist-generator**](./playlist-generator/playlist-generator.py)
@@ -164,11 +166,8 @@ pip install pymediainfo
 &nbsp;
 ## Releases
 
-These are standalone executables that include all necessary libraries.<br/>Furthermore, they do not require Python to be installed.
-
-As of September 2023, the only provided releases are for X11 Linux-x64 systems.
-
-(Windows and macOS versions may follow, as time permits.)
+These are standalone executables that include all necessary libraries. Furthermore, they do not require Python to be installed.<br /><br />
+Note: At present, Windows dark themes are ignored but this may change in a future move to Qt 6.5
 <br/><br/>
 ## Screenshots
 <br/><br/>

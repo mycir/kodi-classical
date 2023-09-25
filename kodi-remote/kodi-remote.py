@@ -85,13 +85,13 @@ class PlayerState(Enum):
     Unknown = auto()
 
 
-class KodiManager(QObject, Kodi):
+class KodiManager(Kodi, QObject):
     seeking = Signal()
     kodi_error = Signal(KodiError)
 
     def __init__(self, host, port, username, password):
-        QObject.__init__(self)
         Kodi.__init__(self, f"http://{host}:{port}/jsonrpc", username, password)
+        QObject.__init__(self)
         self.host = host
         self.port = port
         # not in kodi properties mediatype - add as required
@@ -543,7 +543,6 @@ class KodiRemote(QMainWindow):
         )
 
     def set_styles(self):
-        c_app = self.ui.centralwidget.grab().toImage().pixelColor(0, 0)
         edit = QLineEdit()
         edit.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         block_chr = "\u2588"
@@ -564,19 +563,16 @@ class KodiRemote(QMainWindow):
         # dark themes, e.g. Breeze Dark. For the full horror story see
         # https://stackoverflow.com/questions/75457687
         # TODO investigate Windows and macOS handling of dark themes
-        if c_background.blackF() > c_app.blackF():
-            c_border = c_app.lighter(200)
-        if c_text.blackF() > c_background.blackF():
-            c_pb_background = c_pht.lighter(175)
-            c_pb_chunk = c_pht.lighter(150)
-        else:
-            c_pht = c_text.darker(150)
-            # Qt styles do not include placeholder text
+        if c_background.blackF() > c_text.blackF():
+            c_pb_background = c_background.lighter(250)
+            c_pb_chunk = c_background.lighter(300)
+            c_pht = c_pb_chunk
             p = self.ui.lineEditFilter.palette()
-            p.setColor(QPalette.PlaceholderText, c_pht)
+            p.setColor(QPalette.PlaceholderText, c_pb_chunk)
             self.ui.lineEditFilter.setPalette(p)
-            c_pb_background = c_pht.darker(150)
-            c_pb_chunk = c_pht.darker(125)
+        else:
+            c_pb_background = c_background.darker(125)
+            c_pb_chunk = c_background.darker(150)
         ss = (
             "QListView, QLineEdit, QTextEdit, QProgressBar,"
             f"QFrame#frameLoading{{border: 1px solid {c_border.name()};"
@@ -622,18 +618,9 @@ class KodiRemote(QMainWindow):
         self.ui.pushButtonMute.setIcon(
             self.style().standardIcon(QStyle.SP_MediaVolume)
         )
-        pm = (
-            self.style()
-            .standardIcon(QStyle.SP_TitleBarNormalButton)
-            .pixmap(32, 32)
+        self.ui.pushButtonCombine.setIcon(
+            self.style().standardIcon(QStyle.SP_FileDialogListView)
         )
-        pms = pm.scaled(
-            25,
-            30,
-            Qt.AspectRatioMode.KeepAspectRatio,
-            Qt.TransformationMode.SmoothTransformation,
-        )
-        self.ui.pushButtonCombine.setIcon(pms)
         self.ui.pushButtonCombine.hide()
         self.ui.horizontalSliderSeek.setTracking(False)
         self.ui.horizontalSliderVolume.setValue(self.kodi.get_volume())
@@ -916,6 +903,7 @@ class KodiRemote(QMainWindow):
         qp = QPoint(msgBox.width / 2, msgBox.height / 2)
         msgBox.move(QGuiApplication.screens()[0].geometry().center() - qp)
         QApplication.processEvents()
+        msgBox.setWindowModality(Qt.WindowModal)
         msgBox.exec()
         sys.exit(msgBox.exit_code)
 
@@ -1098,6 +1086,8 @@ class KodiRemote(QMainWindow):
                     combined_items.append(i)
             v += step
             self.ui.progressBar.setValue(v)
+            self.ui.progressBar.update()
+            app.processEvents()
         path = self.model.row(0)[Column.Path] + "."
         self.model.set_items(combined_items, parent_path=path)
         self.set_view(KodiRemote.View.Playlist)

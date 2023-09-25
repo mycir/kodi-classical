@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'kodi_remote.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.4.0
+## Created by: Qt User Interface Compiler version 6.5.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -256,7 +256,7 @@ class Ui_MainWindow(object):
         sizePolicy5.setVerticalStretch(0)
         sizePolicy5.setHeightForWidth(self.pushButtonCombine.sizePolicy().hasHeightForWidth())
         self.pushButtonCombine.setSizePolicy(sizePolicy5)
-        self.pushButtonCombine.setMaximumSize(QSize(30, 25))
+        self.pushButtonCombine.setMaximumSize(QSize(32, 32))
         self.pushButtonCombine.setBaseSize(QSize(0, 0))
 #if QT_CONFIG(tooltip)
         self.pushButtonCombine.setToolTip(u"Combine items from all playlists.")
@@ -281,7 +281,7 @@ class Ui_MainWindow(object):
         sizePolicy6.setHeightForWidth(self.pushButtonSkipBackward.sizePolicy().hasHeightForWidth())
         self.pushButtonSkipBackward.setSizePolicy(sizePolicy6)
         self.pushButtonSkipBackward.setMinimumSize(QSize(0, 0))
-        self.pushButtonSkipBackward.setMaximumSize(QSize(30, 25))
+        self.pushButtonSkipBackward.setMaximumSize(QSize(32, 32))
         self.pushButtonSkipBackward.setBaseSize(QSize(0, 0))
         self.pushButtonSkipBackward.setFocusPolicy(Qt.StrongFocus)
 
@@ -292,7 +292,7 @@ class Ui_MainWindow(object):
         sizePolicy6.setHeightForWidth(self.pushButtonPlay.sizePolicy().hasHeightForWidth())
         self.pushButtonPlay.setSizePolicy(sizePolicy6)
         self.pushButtonPlay.setMinimumSize(QSize(0, 0))
-        self.pushButtonPlay.setMaximumSize(QSize(30, 25))
+        self.pushButtonPlay.setMaximumSize(QSize(32, 32))
         self.pushButtonPlay.setBaseSize(QSize(0, 0))
         self.pushButtonPlay.setFocusPolicy(Qt.StrongFocus)
 
@@ -303,7 +303,7 @@ class Ui_MainWindow(object):
         self.pushButtonStop.setEnabled(True)
         sizePolicy6.setHeightForWidth(self.pushButtonStop.sizePolicy().hasHeightForWidth())
         self.pushButtonStop.setSizePolicy(sizePolicy6)
-        self.pushButtonStop.setMaximumSize(QSize(30, 25))
+        self.pushButtonStop.setMaximumSize(QSize(32, 32))
         self.pushButtonStop.setFocusPolicy(Qt.StrongFocus)
 
         self.horizontalLayoutButtons.addWidget(self.pushButtonStop)
@@ -313,7 +313,7 @@ class Ui_MainWindow(object):
         sizePolicy6.setHeightForWidth(self.pushButtonSkipForward.sizePolicy().hasHeightForWidth())
         self.pushButtonSkipForward.setSizePolicy(sizePolicy6)
         self.pushButtonSkipForward.setMinimumSize(QSize(0, 0))
-        self.pushButtonSkipForward.setMaximumSize(QSize(30, 25))
+        self.pushButtonSkipForward.setMaximumSize(QSize(32, 32))
         self.pushButtonSkipForward.setBaseSize(QSize(0, 0))
         self.pushButtonSkipForward.setFocusPolicy(Qt.StrongFocus)
 
@@ -326,7 +326,7 @@ class Ui_MainWindow(object):
         self.pushButtonMute.setObjectName(u"pushButtonMute")
         sizePolicy6.setHeightForWidth(self.pushButtonMute.sizePolicy().hasHeightForWidth())
         self.pushButtonMute.setSizePolicy(sizePolicy6)
-        self.pushButtonMute.setMaximumSize(QSize(30, 25))
+        self.pushButtonMute.setMaximumSize(QSize(32, 32))
         self.pushButtonMute.setFlat(True)
 
         self.horizontalLayoutAll.addWidget(self.pushButtonMute, 0, Qt.AlignRight)

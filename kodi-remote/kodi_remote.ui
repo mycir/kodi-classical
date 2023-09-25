@@ -460,8 +460,8 @@
              </property>
              <property name="maximumSize">
               <size>
-               <width>30</width>
-               <height>25</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="baseSize">
@@ -524,8 +524,8 @@
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>30</width>
-                 <height>25</height>
+                 <width>32</width>
+                 <height>32</height>
                 </size>
                </property>
                <property name="baseSize">
@@ -558,8 +558,8 @@
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>30</width>
-                 <height>25</height>
+                 <width>32</width>
+                 <height>32</height>
                 </size>
                </property>
                <property name="baseSize">
@@ -589,8 +589,8 @@
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>30</width>
-                 <height>25</height>
+                 <width>32</width>
+                 <height>32</height>
                 </size>
                </property>
                <property name="focusPolicy">
@@ -617,8 +617,8 @@
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>30</width>
-                 <height>25</height>
+                 <width>32</width>
+                 <height>32</height>
                 </size>
                </property>
                <property name="baseSize">
@@ -647,8 +647,8 @@
              </property>
              <property name="maximumSize">
               <size>
-               <width>30</width>
-               <height>25</height>
+               <width>32</width>
+               <height>32</height>
               </size>
              </property>
              <property name="text">

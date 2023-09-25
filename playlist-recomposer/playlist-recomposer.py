@@ -231,7 +231,7 @@ class PlaylistRecomposer:
             cp.write(f, space_around_delimiters=False)
             # https://bugs.python.org/issue32917
             # 'ConfigParser writes a superfluous final blank line'
-            # ...which causes kodi to ignore the playlist, thanks!            
+            # ...which causes kodi to ignore the playlist, thanks!
             if platform.system() == "Windows":
                 newline_len = 2
             else:
@@ -308,8 +308,11 @@ class PlaylistRecomposer:
     class FolderDialog(QFileDialog):
         def __init__(self, title, rootdir=None, catalogue_chooser=None):
             QFileDialog.__init__(self)
+            if QApplication.platformName() == "cocoa":
+                self.setOption(QFileDialog.DontUseNativeDialog)
             self.setWindowTitle(title)
             self.setFileMode(QFileDialog.Directory)
+            self.show()
             if rootdir:
                 self.setDirectory(rootdir)
             if catalogue_chooser:
@@ -378,7 +381,6 @@ class PlaylistRecomposer:
                 self.toggled.connect(self.toggle_all)
                 for box in self.findChildren(QCheckBox):
                     box.stateChanged.connect(self.manage_states)
-                    # box.stateChanged.connect(self.manage_states)
 
             def toggle_all(self, state):
                 for box in self.sender().findChildren(QCheckBox):
@@ -422,7 +424,7 @@ class PlaylistRecomposer:
         LENGTH = 5
 
     class Roman():
-        
+
         numerals = {
             "CM": 900,
             "M": 1000,
@@ -438,7 +440,7 @@ class PlaylistRecomposer:
             "V": 5,
             "I": 1,
         }
-        
+
         decimals = {
             1000: "M",
             900: "CM",
@@ -495,7 +497,7 @@ if __name__ == "__main__":
             err_msg = (
                 "\nCannot continue unless catalogues are chosen\t\n"
             )
-            exit_type = "Aborting"                       
+            exit_type = "Aborting"
         elif rc == 4:
             err_msg = (
                 "\nCannot continue.\n\nPlaylists folder "

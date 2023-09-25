@@ -84,11 +84,7 @@ class PlaylistGenerator:
 
     @staticmethod
     def generate_playlists(playlists_dir, sources_dir, splashscreen=None):
-        if platform.system() == "Windows":
-            sep = "\\"
-        else:
-            sep = "/"
-        common_root = playlists_dir.rpartition(sep)[0]
+        common_root = playlists_dir.rpartition("/")[0]
         sd_relative = sources_dir.partition(common_root)[2][1:]
         for dir, _, files in os.walk(sources_dir):
             media_list = []
@@ -100,17 +96,15 @@ class PlaylistGenerator:
                     )
                     QApplication.processEvents()
                 if f.endswith(__class__.media_types):
-                    f_fqp = f"{dir}{sep}{f}"
+                    f_fqp = f"{dir}/{f}"
                     modified = os.path.getmtime(f_fqp)
                     duration = MediaInfo.parse(f_fqp, output="Audio;%Duration%")
                     if duration != "":
                         length = f"{round(float(duration) / 1000)}"
                     else:
                         length = "0"
-                    f_rp = f_fqp.rpartition(f"{sources_dir}")[2]
-                    if sep == "/":
-                        f_rp = f_rp.replace("/", "\\")
-                    f_txt = f"{dir}{sep}{f.rpartition('.')[0]}.txt"
+                    f_rp = f_fqp.rpartition(f"{sources_dir}")[2].replace("/", "\\")
+                    f_txt = f"{dir}/{f.rpartition('.')[0]}.txt"
                     if os.path.exists(f_txt):
                         with open(f_txt, encoding="latin-1") as f:
                             d = f.read()
@@ -128,7 +122,11 @@ class PlaylistGenerator:
             if media_list != []:
                 # sort descending from most recent
                 media_list.sort(key=lambda m: float(m[1]), reverse=True)
-                dir_rp = dir.rpartition(f"{common_root}{sep}{sd_relative}")
+                dir_rp = dir.rpartition(f"{common_root}/{sd_relative}")
+                if platform.system() == "Windows":
+                    sep = "\\"
+                else:
+                    sep = "/"
                 source = dir_rp[2].split(sep)[1]
                 __class__._generate_playlist(playlists_dir, source, media_list)
         return True
@@ -142,9 +140,13 @@ if __name__ == "__main__":
         root = os.path.expanduser("~")
     err_msg = None
     fd = FolderDialog("Choose mediafile sources folder", root)
+    if QApplication.platformName() == "cocoa":
+        fd.setOption(QFileDialog.DontUseNativeDialog)    
     if fd.exec():
         sf = fd.selectedFiles()[0]
         fd = FolderDialog("Choose destination folder for playlists", root)
+        if QApplication.platformName() == "cocoa":
+            fd.setOption(QFileDialog.DontUseNativeDialog)
         if fd.exec():
             pf = fd.selectedFiles()[0]
             sf_parent = os.path.abspath(os.path.join(sf, os.pardir))
